@@ -1,13 +1,13 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
-from bookrecord.views import UserViewSet
-from django.conf.urls import include
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
+
 
 app_name = 'bookrecord'
 
-router = routers.DefaultRouter()
-router.register('users', UserViewSet)
+router = DefaultRouter()
+router.register('date', views.DateViewSet)
+router.register('profile', views.ProfileViewSet)
 
 
 urlpatterns = [

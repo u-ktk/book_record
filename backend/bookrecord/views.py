@@ -1,45 +1,44 @@
 # APIレスポンス
 from rest_framework import generics
+from rest_framework import viewsets
 
-from .models import Book, Folder
+from .models import Book, Folder, Profile
 # シリアライザーのインポート
 from .serializers import BookSerializer, BookDetailSerializer, FolderBooksSerializer, FolderListSerializer, DateSerializer, DateListSerializer,  UserSerializer
+from . import serializers
 
-# ユーザー認証
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
-from rest_framework import viewsets
-from .ownpermissions import ProfilePermission
-
-# ユーザーのセット　　のちほど実装
+# ログインしたユーザーを更新
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (ProfilePermission,)
-
-
-# ログインしたユーザーを更新するのでRetrieve〜　のちほど実装
 class ManageUserView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     # 認証が通った人のみアクセスできる
-    authentication_classes = (TokenAuthentication)
-    permission_classes = (IsAuthenticated)
+    # authentication_classes = (TokenAuthentication)
+    # permission_classes = (IsAuthenticated)
 
     def get_object(self):
         return self.request.user
 
 
+# 本の登録
+# class
+
+
 class DateViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = DateSerializer
-    authentication_classes = (TokenAuthentication)
-    permission_classes = (IsAuthenticated)
 
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = serializers.ProfileSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(userProfile=self.request.user)
 
 # 本の一覧(Home.js)
+
+
 class BookList(generics.ListAPIView):
     queryset = Book.objects.order_by('-date')
     serializer_class = BookSerializer
